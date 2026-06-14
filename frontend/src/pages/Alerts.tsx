@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Sparkles, FileDown } from "lucide-react";
 import { api, type AlertItem, type AlertsResponse, type LlmResult } from "@/api";
+import { downloadDailyReport } from "@/lib/generateDailyReport";
 import { SeverityBadge, RiskScore } from "@/components/common";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -35,20 +36,35 @@ interface Filters {
   severity: string;
   action: string;
   q: string;
+  date: string;
 }
 
 export default function Alerts() {
   const [data, setData] = useState<AlertsResponse | null>(null);
-  const [filters, setFilters] = useState<Filters>({ severity: "", action: "", q: "" });
+  const [filters, setFilters] = useState<Filters>({ severity: "", action: "", q: "", date: "" });
   const [selected, setSelected] = useState<AlertItem | null>(null);
 
   useEffect(() => {
     setData(null);
     const t = setTimeout(() => {
-      api.alerts({ ...filters, limit: 300 }).then(setData);
+      api.alerts({
+        severity: filters.severity,
+        action: filters.action,
+        q: filters.q,
+        limit: 300,
+      }).then(setData);
     }, 250);
     return () => clearTimeout(t);
-  }, [filters]);
+  }, [filters.severity, filters.action, filters.q]);
+
+  const allItems = data?.items || [];
+  const uniqueDates = Array.from(
+    new Set(allItems.map((item) => item.timestamp.slice(0, 10)))
+  ).sort().reverse();
+
+  const displayedItems = filters.date
+    ? allItems.filter((item) => item.timestamp.startsWith(filters.date))
+    : allItems;
 
   return (
     <AppShell title="Alerts">
@@ -91,12 +107,40 @@ export default function Alerts() {
           </SelectContent>
         </Select>
 
+        <Select
+          value={filters.date || "all"}
+          onValueChange={(v) => setFilters({ ...filters, date: v === "all" ? "" : v })}
+        >
+          <SelectTrigger className="h-9 w-44">
+            <SelectValue placeholder="All dates" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All dates</SelectItem>
+            {uniqueDates.map((d) => (
+              <SelectItem key={d} value={d}>
+                {d}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <Input
           className="h-9 w-56"
           placeholder="Search user / resource…"
           value={filters.q}
-          onChange={(e) => setFilters({ ...filters, q: e.target.value })}
+          onChange={(e) => setFilters({ ...filters, q: e.target.value, date: "" })}
         />
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9"
+          disabled={!filters.date}
+          onClick={() => downloadDailyReport(filters.date, displayedItems)}
+        >
+          <FileDown className="mr-1.5 h-4 w-4" />
+          Daily Report
+        </Button>
       </div>
 
       {!data ? (
@@ -108,7 +152,7 @@ export default function Alerts() {
       ) : (
         <div className="rounded-none border border-border">
           <div className="border-b border-border px-4 py-2 text-xs text-muted-foreground">
-            {data.total} matching alerts — showing {data.items.length}
+            {displayedItems.length} matching alerts
           </div>
           <Table>
             <TableHeader>
@@ -124,7 +168,7 @@ export default function Alerts() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.items.map((a) => (
+              {displayedItems.map((a) => (
                 <TableRow
                   key={a.access_id}
                   className="cursor-pointer"
