@@ -57,6 +57,7 @@ def build_alert(ev: pd.Series) -> dict:
         "time_bucket": ev["time_bucket"],
         "risk_score": int(ev["risk_score"]),
         "severity": sev,
+        "account_age_days": int(ev["account_age_days"]),
         "anomalies_detected": list(ev["factors"]),
         "rules_fired": list(ev["rules_fired"]),
         "business_context": _business_context(ev),

@@ -96,6 +96,7 @@ export interface AlertItem {
   resource_sensitivity: string;
   severity: Severity;
   risk_score: number;
+  account_age_days: number;
   timestamp: string;
   time_bucket: string;
   anomalies_detected: string[];
