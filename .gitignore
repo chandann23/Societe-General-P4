@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+backend/.venv/
+backend/artifacts/
+frontend/node_modules/
+frontend/dist/
+.ipynb_checkpoints/
+.DS_Store
+# generated label files (produced by the pipeline)
+data/data_access_labels.csv
+data/user_profile_labels.csv
+backend/.env
+.env
