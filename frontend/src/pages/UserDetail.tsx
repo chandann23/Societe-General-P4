@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileDown } from "lucide-react";
+import { downloadUserReport } from "@/lib/generateUserReport";
 import { api, type UserDetailResponse } from "@/api";
 import { KpiCard, RiskScore, SeverityBadge } from "@/components/common";
 import { AppShell } from "@/components/app-shell";
@@ -52,12 +53,22 @@ export default function UserDetail() {
   return (
     <AppShell title={p.username}>
       <div className="mb-4">
-        <Button variant="ghost" size="sm" className="-ml-2 mb-3" asChild>
-          <Link to="/users">
-            <ArrowLeft className="mr-1.5 h-4 w-4" />
-            Users
-          </Link>
-        </Button>
+        <div className="-ml-2 mb-3 flex items-center gap-2">
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/users">
+              <ArrowLeft className="mr-1.5 h-4 w-4" />
+              Users
+            </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => downloadUserReport(p, data.events)}
+          >
+            <FileDown className="mr-1.5 h-4 w-4" />
+            Download Report
+          </Button>
+        </div>
         <p className="font-mono text-xs text-muted-foreground">
           {p.user_id} &middot; {p.department} &middot; {p.job_title} &middot; {p.privilege_level}
         </p>
