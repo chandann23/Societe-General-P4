@@ -7,6 +7,7 @@ import Alerts from "./pages/Alerts";
 import Users from "./pages/Users";
 import UserDetail from "./pages/UserDetail";
 import Evaluation from "./pages/Evaluation";
+import Sandbox from "./pages/Sandbox";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/users/:id" element={<UserDetail />} />
           <Route path="/evaluation" element={<Evaluation />} />
+          <Route path="/sandbox" element={<Sandbox />} />
         </Routes>
       </SidebarInset>
       <Toaster position="bottom-right" richColors />

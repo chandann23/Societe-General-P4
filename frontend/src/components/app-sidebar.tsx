@@ -1,4 +1,4 @@
-import { AlertTriangle, BarChart3, LayoutDashboard, ShieldAlert, Users2 } from "lucide-react";
+import { AlertTriangle, BarChart3, LayoutDashboard, ShieldAlert, Users2, Terminal } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import type { ComponentType } from "react";
 import {
@@ -45,7 +45,10 @@ const NAV: NavGroup[] = [
   },
   {
     label: "Analytics",
-    items: [{ href: "/evaluation", icon: BarChart3, label: "Evaluation" }],
+    items: [
+      { href: "/evaluation", icon: BarChart3, label: "Evaluation" },
+      { href: "/sandbox", icon: Terminal, label: "Sandbox" },
+    ],
   },
 ];
 

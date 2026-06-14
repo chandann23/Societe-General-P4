@@ -38,6 +38,16 @@ export const api = {
   },
   user: (id: string) => get<UserDetailResponse>(`/users/${id}`),
   generateNarrative: (id: string) => post<LlmResult>(`/alerts/${id}/narrative`),
+  analyzeEvent: (body: SandboxInput) => {
+    return fetch(BASE + "/analyze-event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then((res) => {
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      return res.json() as Promise<SandboxResult>;
+    });
+  },
 };
 
 export const SEV_COLORS: Record<string, string> = {
@@ -163,4 +173,27 @@ export interface EventItem {
 export interface UserDetailResponse {
   profile: UserProfile;
   events: EventItem[];
+}
+
+export interface SandboxInput {
+  raw_line?: string;
+  timestamp?: string;
+  user_id?: string;
+  username?: string;
+  action?: string;
+  resource?: string;
+  resource_sensitivity?: string;
+  rowcount?: number;
+  destination?: string;
+  termination_filed?: boolean;
+}
+
+export interface SandboxResult {
+  alert_id: string;
+  user_id: string;
+  risk_score: number;
+  severity: Severity;
+  anomalies_detected: string[];
+  business_context: string;
+  recommendation: string;
 }
